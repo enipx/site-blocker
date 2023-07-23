@@ -1,0 +1,15 @@
+{
+  "devDependencies": {
+    "@types/chrome": "^0.0.241",
+    "typescript": "^5.1.6"
+  },
+  "scripts": {
+    "watch:ts": "webpack --config webpack.config.js --mode production --watch",
+    "build": "webpack --config webpack.config.js --mode production"
+  },
+  "dependencies": {
+    "ts-loader": "^9.4.4",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4"
+  }
+}

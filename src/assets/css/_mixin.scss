@@ -1,0 +1,6 @@
+// Position: center content vertically
+@mixin pos-center-y {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
