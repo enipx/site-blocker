@@ -3,7 +3,7 @@ import {
   getDOMElementHandler,
   onLoadHandler,
   redirectHandler,
-} from "./helpers/_base";
+} from "./helpers/base";
 import { getStoredValue, storeValue } from "./helpers/storage";
 
 const onMountHandler = async () => {

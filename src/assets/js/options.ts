@@ -6,7 +6,7 @@ import {
   getDeviceMode,
   onLoadHandler,
   showFeedbackHandler,
-} from "./helpers/_base";
+} from "./helpers/base";
 import { getStoredValue, storeValue } from "./helpers/storage";
 
 const selectors = AllElementsSelectors;

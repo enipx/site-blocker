@@ -7,6 +7,8 @@ module.exports = {
     background: './src/assets/js/background.ts',
     options: './src/assets/js/options.ts',
     focus: './src/assets/js/focus.ts',
+    content: './src/assets/js/content.ts',
+    others: './src/assets/js/others.ts'
   },
   module: {
     rules: [

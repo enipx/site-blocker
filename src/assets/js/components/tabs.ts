@@ -1,6 +1,6 @@
-import { getDOMElementHandler } from "../helpers/_base";
+import { getDOMElementHandler } from "../helpers/base";
 
-const selector = 'tabs';
+const selector = "tabs";
 
 type TabsParamsType = {
   target: HTMLElement;
@@ -29,14 +29,14 @@ class Tabs {
 
   constructor() {
     this.isActive = false;
-    this.activeClass = 'active';
-    this.domSelector = '';
-    this.domTabItemSelector = '.tabs_nav_item';
-    this.domTabPanelSelector = '.tabs_panel';
-    this.domElement = getDOMElementHandler('body'); // Get body by default then initialize with accordion element later
-    this.domTargetElement = getDOMElementHandler('body'); // Get body by default then initialize with accordion element later
-    this.domTargetParentElement = getDOMElementHandler('body'); // Get body by default then initialize with accordion parent element later
-    this.domParentElement = getDOMElementHandler('body'); // Get body by default then initialize with accordion parent element later
+    this.activeClass = "active";
+    this.domSelector = "";
+    this.domTabItemSelector = ".tabs_nav_item";
+    this.domTabPanelSelector = ".tabs_panel";
+    this.domElement = getDOMElementHandler("body"); // Get body by default then initialize with accordion element later
+    this.domTargetElement = getDOMElementHandler("body"); // Get body by default then initialize with accordion element later
+    this.domTargetParentElement = getDOMElementHandler("body"); // Get body by default then initialize with accordion parent element later
+    this.domParentElement = getDOMElementHandler("body"); // Get body by default then initialize with accordion parent element later
   }
 
   setUpParams(params: TabsParamsType): void {
@@ -62,7 +62,7 @@ class Tabs {
   }
 
   open(params: TabsParamsType, init = true): void {
-    init ? this.setUpParams(params) : '';
+    init ? this.setUpParams(params) : "";
 
     // Close other
     this.closeOthers();
@@ -86,8 +86,7 @@ class Tabs {
   }
 }
 
-
-window.addEventListener('click', (evt: Event) => {
+window.addEventListener("click", (evt: Event) => {
   const target = <HTMLElement>evt.target;
   const toggleTarget = target.dataset.toggle;
 
@@ -102,7 +101,7 @@ window.addEventListener('click', (evt: Event) => {
       tabs.toggle({
         selector: targetedTab,
         target,
-      })
+      });
     }
   }
-})
+});

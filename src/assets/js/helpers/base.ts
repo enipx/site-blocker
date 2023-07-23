@@ -1,3 +1,4 @@
+import { FocusModeData } from "./data";
 import { getStoredValue, storeValue } from "./storage";
 
 export type ModeType = "dark" | "light";
@@ -157,6 +158,17 @@ export const addItemToListHandler = (options: AddItemToListHandlerOptions) => {
       type,
     });
   }
+
+  // reload current tab
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    const currentTabUrl = tabs[0].url;
+    const url = new URL(currentTabUrl || "");
+
+    if (url.hostname === value) {
+      // @ts-ignore
+      chrome.tabs.reload(tabs[0].id);
+    }
+  });
 };
 
 export type AddArrayItemToListHandlerOptions = {
@@ -259,4 +271,134 @@ export const manageItemsHandler = async (
   }
 
   return data;
+};
+
+type IsValidUrlHandlerOptions = {
+  url: string;
+  redirect?: boolean;
+};
+
+export const stripUrlHandler = (url: string) => {
+  /**
+   * convert url e.g =
+   * 'https://www.facebook.com/' OR 'http://www.facebook.com/'
+   * to = 'facebook.com'
+   */
+
+  return url
+    .replace("https://www.", "")
+    .replace("http://www.", "")
+    .replace("https://", "")
+    .replace("http://", "");
+};
+
+export const canIgnoreUrlHandler = async (url: string) => {
+  const ignoreParams = ["ignore-site-blocker"];
+
+  const allowIgnore = (await getStoredValue("allowIgnore")) as boolean;
+
+  const newUrl = new URL(url);
+
+  return (
+    allowIgnore && ignoreParams.some((param) => newUrl.searchParams.has(param))
+  );
+};
+
+export const compareHostnames = (url1: string, url2: string) => {
+  const getDomainWithoutSubdomain = (hostname: string) => {
+    const parts = hostname.split(".");
+    return parts.slice(-2).join("."); // Join last two parts, e.g., "facebook.com"
+  };
+
+  try {
+    const parsedUrl1 = new URL(
+      url1.startsWith("http") ? url1 : `http://${url1}`
+    );
+    const parsedUrl2 = new URL(
+      url2.startsWith("http") ? url2 : `http://${url2}`
+    );
+
+    const hostname1 = getDomainWithoutSubdomain(parsedUrl1.hostname);
+    const hostname2 = getDomainWithoutSubdomain(parsedUrl2.hostname);
+
+    return hostname1 === hostname2;
+  } catch (error) {
+    console.error("Error parsing URLs:", error);
+    return false;
+  }
+};
+
+type IsUrlBlockedCheckHandlerOptions = {
+  url: string;
+  data: string[];
+  type?: BlockingType;
+};
+
+const isUrlBlockedCheckHandler = (options: IsUrlBlockedCheckHandlerOptions) => {
+  const { url, data, type = "site" } = options;
+
+  const stripedUrl = stripUrlHandler(url);
+
+  if (type === "word") {
+    return data.some((word) => url.includes(word.toLowerCase()));
+  }
+
+  return data.some((site) => {
+    const stripedSite = stripUrlHandler(site.toLowerCase());
+
+    const hostNameMatches = compareHostnames(url, site);
+
+    if (hostNameMatches) {
+      return true;
+    }
+
+    return stripedUrl.startsWith(stripedSite);
+  });
+};
+
+export const isValidUrlHandler = async (options: IsValidUrlHandlerOptions) => {
+  const { redirect } = options;
+
+  const url = options.url.toLowerCase();
+
+  const words = (await getStoredValue("disabledWords")) as string[];
+
+  const sites = (await getStoredValue("disabledSites")) as string[];
+
+  const focusModeEnabled = await getStoredValue("focusModeEnabled");
+
+  const canIgnore = await canIgnoreUrlHandler(url);
+
+  // valid by default
+  let valid = true;
+
+  // check if url is in sites
+  if (sites && sites.length > 0) {
+    valid = !isUrlBlockedCheckHandler({ data: sites, url });
+  }
+
+  // check if url is in words
+  if (words && words.length > 0) {
+    valid = !isUrlBlockedCheckHandler({ data: words, url, type: "word" });
+  }
+
+  // check if focus mode is enabled
+  if (focusModeEnabled) {
+    valid = !(
+      isUrlBlockedCheckHandler({ data: FocusModeData.site, url }) ||
+      isUrlBlockedCheckHandler({ data: FocusModeData.words, url, type: "word" })
+    );
+  }
+
+  // check is allow ignore
+  if (canIgnore) {
+    valid = true;
+  }
+
+  // if redirect exist
+  if (redirect && !valid) {
+    redirectHandler("/blocked.html");
+  }
+
+  return valid;
 };

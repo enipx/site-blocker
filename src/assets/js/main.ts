@@ -3,12 +3,12 @@ import {
   addArrayItemToListHandler,
   addItemToListHandler,
   getDOMElementHandler,
-  manageItemsHandler,
+  isValidUrlHandler,
   onLoadHandler,
   redirectHandler,
   removeItemFromListHandler,
   showFeedbackHandler,
-} from "./helpers/_base";
+} from "./helpers/base";
 import { getStoredValue, storeValue } from "./helpers/storage";
 
 type GlobalStateType = {
@@ -19,6 +19,18 @@ type GlobalStateType = {
 const globalState: GlobalStateType = {
   disabledSites: [],
   disabledWords: [],
+};
+
+const selectors = AllElementsSelectors;
+
+const formsElement = {
+  site: getDOMElementHandler(selectors.blockSiteForm),
+  word: getDOMElementHandler(selectors.blockWordForm),
+};
+
+const inputsElement = {
+  site: getDOMElementHandler(selectors.siteInput) as HTMLInputElement,
+  word: getDOMElementHandler(selectors.wordInput) as HTMLInputElement,
 };
 
 const onMountHandler = async () => {
@@ -59,21 +71,19 @@ const onMountHandler = async () => {
   });
 
   onLoadHandler();
+
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    const currentTabUrl = tabs[0].url;
+    const newUrl = new URL(currentTabUrl || "");
+
+    if (inputsElement.site && currentTabUrl && currentTabUrl !== undefined) {
+      // @ts-ignore
+      inputsElement.site.value = newUrl.hostname;
+    }
+  });
 };
 
 onMountHandler();
-
-const selectors = AllElementsSelectors;
-
-const formsElement = {
-  site: getDOMElementHandler(selectors.blockSiteForm),
-  word: getDOMElementHandler(selectors.blockWordForm),
-};
-
-const inputsElement = {
-  site: getDOMElementHandler(selectors.siteInput) as HTMLInputElement,
-  word: getDOMElementHandler(selectors.wordInput) as HTMLInputElement,
-};
 
 /**
  *

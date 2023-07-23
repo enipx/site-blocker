@@ -1,6 +1,6 @@
 {
   "name": "Site Blocker - Productive",
-  "description": "Stay focused and boost productivity with site blocker extension. Take control of your online time by blocking distracting websites and creating custom filters to help you maintain concentration on your important tasks.",
+  "description": "Take control of your time & boost productivity by blocking distracting websites",
   "version": "1.0.0",
   "manifest_version": 3,
   "icons": {
@@ -22,5 +22,12 @@
     }
   },
   "options_page": "./src/options.html",
-  "permissions": ["activeTab", "tabs", "storage", "scripting"]
+  "permissions": ["storage", "webNavigation", "tabs"],
+  "host_permissions": ["http://*/*/", "https://*/*/"],
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["./dist/js/content.js"]
+    }
+  ]
 }
