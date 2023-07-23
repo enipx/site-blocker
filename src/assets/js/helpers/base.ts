@@ -340,7 +340,7 @@ const isUrlBlockedCheckHandler = (options: IsUrlBlockedCheckHandlerOptions) => {
   const stripedUrl = stripUrlHandler(url);
 
   if (type === "word") {
-    return data.some((word) => url.includes(word.toLowerCase()));
+    return data.some((word) => url.toLowerCase().includes(word.toLowerCase()));
   }
 
   return data.some((site) => {
