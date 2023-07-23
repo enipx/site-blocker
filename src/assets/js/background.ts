@@ -15,7 +15,9 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
     if (!valid) {
       // Redirect the user to a different page
       // @ts-ignore
-      chrome.tabs.update(sender?.tab?.id, { url: "/src/blocked.html" });
+      chrome.tabs.update(sender?.tab?.id, {
+        url: `/src/blocked.html?url=${url}`,
+      });
     }
   }
 });

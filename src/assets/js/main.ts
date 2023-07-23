@@ -143,4 +143,9 @@ focusButton?.addEventListener("click", () => {
   storeValue("focusModeEnabled", true);
 
   redirectHandler("/src/focus.html");
+
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    // @ts-ignore
+    chrome.tabs.reload(tabs[0].id);
+  });
 });
